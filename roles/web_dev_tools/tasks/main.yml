@@ -1,0 +1,49 @@
+---
+- name: ensure web dev tools are installed
+  apt: pkg="{{ item }}" state=latest
+  with_items:
+    - virtualbox
+    - meld
+    - wireshark
+    - gcolor2
+  sudo: yes
+
+
+- name: Download Vagrant
+  shell: aria2c -c -x 10 -s {{ downloadThreads }} https://dl.bintray.com/mitchellh/vagrant/vagrant_{{ vVagrant }}_x86_64.deb chdir={{ downloadDir }} creates=vagrant_{{ vVagrant }}_x86_64.deb
+
+- name: Install Vagrant
+  apt: deb={{ downloadDir }}/vagrant_{{ vVagrant }}_x86_64.deb
+  sudo: yes
+
+
+- name: Download MySQL Workbench
+  shell: axel -n {{ downloadThreads }} http://dev.mysql.com/get/Downloads/MySQLGUITools/mysql-workbench-community-{{ vMySQLWB }}-amd64.deb chdir={{ downloadDir }} creates=mysql-workbench-community-{{ vMySQLWB }}-amd64.deb
+
+- name: Install MySQL Workbench
+  apt: deb={{ downloadDir }}/mysql-workbench-community-{{ vMySQLWB }}-amd64.deb
+  sudo: yes
+
+
+- name: Download RoboMongo
+  shell: axel -n {{ downloadThreads }} http://robomongo.org/files/linux/robomongo-{{ vRoboMongo }}-x86_64.deb chdir={{ downloadDir }} creates=robomongo-{{ vRoboMongo }}-x86_64.deb
+
+- name: Install RoboMongo
+  apt: deb={{ downloadDir }}/robomongo-{{ vRoboMongo }}-x86_64.deb
+  sudo: yes
+
+
+- name: Download 0xDBE
+  shell: axel -n {{ downloadThreads }} http://download.jetbrains.com/dbe/0xdbe-{{ v0xDBE }}.tar.gz chdir={{ downloadDir }} creates=0xdbe-{{ v0xDBE }}.tar.gz
+
+- name: Install 0xDBE
+  shell: mkdir -p {{ installDir }}/0xdbe-{{ v0xDBE }} && tar -xf {{ downloadDir }}/0xdbe-{{ v0xDBE }}.tar.gz -C {{ installDir }}/0xdbe-{{ v0xDBE }} --strip-components=1 creates={{ installDir }}/0xdbe-{{ v0xDBE }}
+
+
+
+# Due to URL specific it can not be parametrized by version variable
+- name: Download GitEye
+  shell: aria2c -c -x 10 -s {{ downloadThreads }} https://downloads-guests.open.collab.net/files/documents/61/9414/GitEye-1.8.0-linux.x86_64.zip chdir={{ downloadDir }} creates=GitEye-1.8.0-linux.x86_64.zip
+
+- name: Install GitEye
+  shell: unzip {{ downloadDir }}/GitEye-1.8.0-linux.x86_64.zip -d {{ installDir }}/GitEye-1.8.0  creates={{ installDir }}/GitEye-1.8.0

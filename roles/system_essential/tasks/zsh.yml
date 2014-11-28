@@ -1,0 +1,28 @@
+---
+- name: Ensure ZSH installed
+  apt: pkg=zsh state=latest
+  sudo: yes
+
+- name: Get ZSH
+  shell: creates="/home/{{ ansible_ssh_user }}/.oh-my-zsh" su - {{ ansible_ssh_user }} -c 'wget https://github.com/robbyrussell/oh-my-zsh/raw/master/tools/install.sh -O - | sed -n '/chsh/!p' | zsh'
+  sudo: yes
+
+- name: Change theme for vagrant user
+  shell: sed -i 's/ZSH_THEME="robbyrussell"/ZSH_THEME="jreese"/' /home/{{ ansible_ssh_user }}/.zshrc
+
+- name: Change default shell for vagrant user
+  shell: chsh {{ ansible_ssh_user }} -s $(which zsh)
+  ignore_errors: yes
+
+- name: Get ZSH for root
+  shell: creates="/root/.oh-my-zsh" sudo su - root -c 'wget https://github.com/robbyrussell/oh-my-zsh/raw/master/tools/install.sh -O - | sed -n '/chsh/!p' | zsh'
+  sudo: yes
+
+- name: Change theme for root
+  shell: sed -i 's/ZSH_THEME="robbyrussell"/ZSH_THEME="jreese"/' /root/.zshrc
+  sudo: yes
+
+- name: Change default shell for root
+  shell: chsh root -s $(which zsh)
+  ignore_errors: yes
+  sudo: yes

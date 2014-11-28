@@ -1,0 +1,74 @@
+---
+- name: add PPA repos
+  apt_repository: repo="{{ item }}" update_cache=yes
+  with_items:
+    - ppa:tualatrix/ppa
+    - ppa:webupd8team/themes
+  sudo: yes
+
+- name: Update caches after PPA being added
+  apt: update_cache=yes
+  sudo: yes
+
+
+- name: ensure tweak packages installed
+  apt: pkg="{{ item }}" state=latest
+  with_items:
+    - ubuntu-tweak
+    - gnome-shell-common
+  sudo: yes
+
+
+- name: ensure fonts installed
+  apt: pkg="{{ item }}" state=latest
+  with_items:
+    - fonts-droid
+    - fonts-inconsolata
+  sudo: yes
+
+
+- name: Download Input font
+  shell: axel -n {{ downloadThreads }} "http://input.fontbureau.com/build/?fontSelection=whole&a=ss&g=0&i=serifs_round&l=serifs_round&zero=0&asterisk=0&braces=0&preset=default&line-height=1.2&accept=I+do&email=" -o Input-Font.zip chdir={{ downloadDir }} creates=Input-Font.zip
+
+- name: Unzip Input Fonts
+  shell: unzip Input-Font.zip -d InputFont chdir={{ downloadDir }} creates=InputFont
+
+- name: Install Input Fonts
+  shell: mkdir -p /usr/share/fonts/truetype/input && find {{ downloadDir }}/InputFont -name '*.ttf' -exec cp {} /usr/share/fonts/truetype/input \;
+  sudo: yes
+
+
+- name: Download Ubuntu Fonts
+  shell: axel -n {{ downloadThreads }} http://font.ubuntu.com/download/ubuntu-font-family-0.80.zip chdir={{ downloadDir }} creates=ubuntu-font-family-0.80.zip
+
+- name: Unzip Ubuntu Fonts
+  shell: unzip ubuntu-font-family-0.80.zip -d /usr/share/fonts/truetype/UbuntuFonts chdir={{ downloadDir }} creates=/usr/share/fonts/truetype/UbuntuFonts
+  sudo: yes
+
+
+- name: Set Default Fonts
+  shell: sudo -iu {{ ansible_ssh_user }} gsettings set org.gnome.desktop.interface {{ item.type }} '{{ item.font }}'
+  with_items:
+    - { type: "document-font-name", font: "Ubuntu 11" }
+    - { type: "font-name", font: "Ubuntu 10" }
+    - { type: "monospace-font-name", font: "Input Mono Narrow Light Semi-Condensed 11" }
+  sudo: yes
+
+
+- name: install themes from PPAs
+  apt: name="{{ item }}" state=present
+  with_items:
+    - faenza-icon-theme
+    - faience-icon-theme
+    - zukitwo-theme
+  sudo: yes
+
+- name: Set Gtk Theme
+  shell: sudo -iu {{ ansible_ssh_user }} gsettings set org.gnome.desktop.interface gtk-theme "Zukitwo"
+
+- name: Set Icon Theme
+  shell: sudo -iu {{ ansible_ssh_user }} gsettings set org.gnome.desktop.interface icon-theme "Faenza-Dark"
+
+- name: Set Window Theme
+  shell: sudo -iu {{ ansible_ssh_user }} gsettings set org.gnome.desktop.wm.preferences theme "Zukitwo"
+

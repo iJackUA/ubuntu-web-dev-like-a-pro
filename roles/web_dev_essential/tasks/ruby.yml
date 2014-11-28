@@ -1,0 +1,31 @@
+---
+- name: Install sys pkgs useful for Ruby
+  apt: pkg={{ item }} state=latest
+  with_items:
+    - sqlite3
+    - libsqlite3-dev
+    - libssl-dev
+  sudo: yes
+
+- name: Install rbenv
+  git: repo=https://github.com/sstephenson/rbenv.git dest=~/.rbenv
+
+# register in ZSH shell
+- shell: echo 'export PATH="$HOME/.rbenv/bin:$PATH"' >> ~/.zshrc
+- shell: echo 'eval "$(rbenv init -)"' >> ~/.zshrc
+# register in Bash shell
+- shell: echo 'export PATH="$HOME/.rbenv/bin:$PATH"' >> ~/.bashrc
+- shell: echo 'eval "$(rbenv init -)"' >> ~/.bashrc
+
+
+- name: Install ruby-build (rbenv plugin)
+  git: repo=https://github.com/sstephenson/ruby-build.git dest=~/.rbenv/plugins/ruby-build
+
+- name: Install specified Ruby version via rbenv
+  shell: sudo -iu {{ ansible_ssh_user }} ~/.rbenv/bin/rbenv install {{ vRuby_rbenv }} executable=/bin/bash creates=~/.rbenv/versions/{{ vRuby_rbenv }}
+
+- name: Set global Ruby version
+  shell: sudo -iu {{ ansible_ssh_user }} ~/.rbenv/bin/rbenv global {{ vRuby_rbenv }} executable=/bin/bash
+
+- name: Rehash rbenv
+  shell: sudo -iu {{ ansible_ssh_user }} ~/.rbenv/bin/rbenv rehash executable=/bin/bash

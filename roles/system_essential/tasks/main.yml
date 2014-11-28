@@ -1,0 +1,76 @@
+---
+- name: ensure system packages are installed
+  apt: pkg="{{ item }}" state=latest
+  with_items:
+    - ubuntu-restricted-extras
+    - ubuntu-restricted-addons
+    - gdebi
+    - git-core
+    - curl
+    - wget
+    - axel
+    - aria2
+    - htop
+    - mc
+    - unzip
+    - gnome-disk-utility
+    - libpq-dev
+    - build-essential
+    - gcc
+    - openssl
+    - dconf-tools
+    - python-software-properties
+    - python-apt
+    - python-mysqldb
+    - python-psycopg2
+  sudo: yes
+
+# TODO : Check this to work properly. Ideally change to check "lspci | grep nvidia -i"
+# maybe like this " result.stdout.find("all systems go") != -1 " ?
+
+- name: install Nvidia drivers
+  apt: pkg=nvidia-current state=latest
+  sudo: yes
+  when: installNvidiaDriver == "yes"
+
+
+- name: add Terra PPA key
+  apt_key: keyserver=keyserver.ubuntu.com id=CCDE75CC02463F8A
+  sudo: yes
+
+
+- name: add PPA repos
+  apt_repository: repo="{{ item }}"
+  with_items:
+    - deb http://ppa.launchpad.net/ozcanesen/terra-terminal/ubuntu raring main
+    - ppa:synapse-core/ppa
+    - ppa:webupd8team/java
+    - ppa:ubuntu-wine/ppa
+  sudo: yes
+
+
+- name: Update caches after PPA being added
+  apt: update_cache=yes
+  sudo: yes
+
+
+- name: install packages from PPAs
+  apt: name="{{ item }}" state=present
+  with_items:
+    - terra
+    - terminator
+    - synapse
+    - wine
+  sudo: yes
+
+# JAVA INSTALLATION # Also available oracle-java6-installer and oracle-java8-installer
+
+- name: prepare answers for Java7 install wizard
+  debconf: name="oracle-java7-installer" question="shared/accepted-oracle-license-v1-1" value="true" vtype="select"
+  sudo: yes
+
+- name: install Java7
+  apt: name="oracle-java7-installer" state=present
+  sudo: yes
+
+- include: zsh.yml

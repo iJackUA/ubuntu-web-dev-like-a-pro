@@ -1,0 +1,39 @@
+---
+- name: add PPA key
+  apt_key: keyserver=keyserver.ubuntu.com id="{{ item }}"
+  with_items:
+    - 4A68EAD32DEB7C31  #handbrake
+    - FC918B335044912E  #vokoscree
+  sudo: yes
+
+
+- name: add PPA repos
+  apt_repository: repo="{{ item }}"
+  with_items:
+    - deb http://ppa.launchpad.net/stebbins/handbrake-releases/ubuntu raring main
+    - deb http://ppa.launchpad.net/vokoscreen-dev/vokoscreen/ubuntu saucy main
+    - ppa:starws-box/deadbeef-player
+    - ppa:vovansrnd/coolreader
+    - ppa:osmoma/audio-recorder
+    - ppa:maarten-baert/simplescreenrecorder
+  sudo: yes
+
+
+- name: Update caches after PPA being added
+  apt: update_cache=yes
+  sudo: yes
+
+- name: ensure media packages installed
+  apt: pkg="{{ item }}" state=latest force=yes
+  with_items:
+    - vlc
+    - handbrake-gtk
+    - clementine
+    - deadbeef
+    - audio-recorder
+    - simplescreenrecorder
+    - vokoscreen
+    - shutter
+    - gthumb
+    - cr3
+  sudo: yes

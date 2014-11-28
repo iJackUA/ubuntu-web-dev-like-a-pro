@@ -1,0 +1,45 @@
+---
+- name: Ensure PHP 5.5 repository
+  apt_repository: repo='ppa:ondrej/php5-5.6' state=present update_cache=yes
+  sudo: yes
+
+- name: Ensure PHP installed
+  apt: pkg={{ item }} state=latest update_cache=yes
+  with_items:
+    - php5
+    - php5-dev
+    - libapache2-mod-php5
+    - php5-cli
+    - php5-json
+    - php5-mysql
+    - php5-curl
+    - php5-gd
+    - php5-mcrypt
+    - php5-xdebug
+  sudo: yes
+  notify : restart apache
+
+- name: Configure PHP settings
+  lineinfile: dest=/etc/php5/apache2/php.ini regexp="^{{ item.param }} =" line="{{ item.param }} = {{ item.value }}"
+  with_items :
+    - { param: error_reporting, value: E_ALL }
+    - { param: display_errors, value: On }
+    - { param: post_max_size, value: 200M }
+    - { param: upload_max_filesize, value: 200M }
+    - { param: max_input_time, value: 30 }
+    - { param: max_execution_time, value: 30 }
+    - { param: short_open_tag, value: Off }
+    - { param: date.timezone , value: "Europe/London" }
+  sudo: yes
+  notify : restart apache
+
+- name: Configure PHP xdebug
+  lineinfile: dest=/etc/php5/mods-available/xdebug.ini regexp="^{{ item.param }} =" line="{{ item.param }} = {{ item.value }}" create=yes mode=0644
+  with_items :
+    - { param: xdebug.remote_enable, value: 1 }
+    - { param: xdebug.remote_handler, value: dbgp }
+    - { param: xdebug.remote_port , value: 9000 }
+    - { param: xdebug.remote_host , value: localhost }
+    - { param: xdebug.cli_color, value: 1 }
+  sudo: yes
+  notify : restart apache

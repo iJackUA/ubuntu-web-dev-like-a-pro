@@ -1,0 +1,30 @@
+---
+- name: add Browser repositories
+  apt_repository: repo="{{ item }}" state=present
+  with_items:
+    - deb http://dl.google.com/linux/chrome/deb/ stable main
+    - ppa:chromium-daily/stable
+    - deb http://deb.opera.com/opera/ stable non-free
+  sudo: yes
+
+
+- name: import Browser repo keys
+  shell: wget -q -O - {{ item }} | sudo apt-key add -
+  with_items:
+    - https://dl-ssl.google.com/linux/linux_signing_key.pub
+    - http://deb.opera.com/archive.key
+  sudo: yes
+
+
+- name: Update caches after repos being added
+  apt: update_cache=yes
+  sudo: yes
+
+- name : install Chromium Stable
+  apt: name="{{ item }}" state=present
+  with_items:
+    - google-chrome-stable
+    - chromium-browser
+    - firefox
+    - opera
+  sudo: yes

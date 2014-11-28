@@ -1,0 +1,49 @@
+---
+- name: add PPA repos
+  apt_repository: repo="{{ item }}" update_cache=yes
+  with_items:
+    - ppa:webupd8team/atom
+    - ppa:webupd8team/sublime-text-3
+  sudo: yes
+
+- name: Update caches after PPA being added
+  apt: update_cache=yes
+  sudo: yes
+
+- name : install IDEs from PPAs
+  apt: name="{{ item }}" state=present
+  with_items:
+    - atom
+    - sublime-text-installer
+  sudo: yes
+
+
+- name: Download PhpStorm
+  shell: axel -n {{ downloadThreads }} http://download.jetbrains.com/webide/PhpStorm-{{ vPhpStorm }}.tar.gz chdir={{ downloadDir }} creates=PhpStorm-{{ vPhpStorm }}.tar.gz
+
+- name: Install PhpStorm
+  shell: mkdir -p {{ installDir }}/PhpStorm-{{ vPhpStorm }} && tar -xf {{ downloadDir }}/PhpStorm-{{ vPhpStorm }}.tar.gz -C {{ installDir }}/PhpStorm-{{ vPhpStorm }} --strip-components=1 creates={{ installDir }}/PhpStorm-{{ vPhpStorm }}
+
+
+
+- name: Download PyCharm
+  shell: axel -n {{ downloadThreads }} http://download.jetbrains.com/python/pycharm-community-{{ vPyCharm }}.tar.gz chdir={{ downloadDir }} creates=pycharm-community-{{ vPyCharm }}.tar.gz
+
+- name: Install PyCharm
+  shell: mkdir -p {{ installDir }}/pycharm-community-{{ vPyCharm }} && tar -xf {{ downloadDir }}/pycharm-community-{{ vPyCharm }}.tar.gz -C {{ installDir }}/pycharm-community-{{ vPyCharm }} --strip-components=1 creates={{ installDir }}/pycharm-community-{{ vPyCharm }}
+
+
+
+- name: Download RubyMine
+  shell: axel -n {{ downloadThreads }} http://download.jetbrains.com/ruby/RubyMine-{{ vRubyMine }}.tar.gz chdir={{ downloadDir }} creates=RubyMine-{{ vRubyMine }}.tar.gz
+
+- name: Install RubyMine
+  shell: mkdir -p {{ installDir }}/RubyMine-{{ vRubyMine }} && tar -xf {{ downloadDir }}/RubyMine-{{ vRubyMine }}.tar.gz -C {{ installDir }}/RubyMine-{{ vRubyMine }} --strip-components=1 creates={{ installDir }}/RubyMine-{{ vRubyMine }}
+
+
+- name: Download Brakets
+  shell: aria2c -c -x 10 -s {{ downloadThreads }} https://github.com/adobe/brackets/releases/download/release-1.0/Brackets.Release.1.0.64-bit.deb chdir={{ downloadDir }} creates=Brackets.Release.1.0.64-bit.deb
+
+- name: Install Brakets
+  apt: deb={{ downloadDir }}/Brackets.Release.1.0.64-bit.deb
+  sudo: yes

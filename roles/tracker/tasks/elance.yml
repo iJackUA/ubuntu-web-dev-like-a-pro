@@ -1,0 +1,11 @@
+---
+- name: Install Adobe Air
+  script: adobe-air-install.sh
+  sudo: yes
+
+- name: Download Elance tracker
+  shell: aria2c -c -x 10 -s {{ downloadThreads }} https://www.elance.com/tracker/TrackerSetup.deb chdir={{ downloadDir }} creates=TrackerSetup.deb
+
+- name: Install Elance tracker
+  apt: deb={{ downloadDir }}/TrackerSetup.deb
+  sudo: yes

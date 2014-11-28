@@ -1,0 +1,56 @@
+---
+- name: prepare WWW dir
+  file: path={{ apacheLocalhostDocumentRoot }}/adminer state=directory
+
+
+- include: apache.yml
+- include: php.yml
+- include: mysql.yml
+
+
+- name: Download Composer
+  shell: creates="composer.phar" curl -s http://getcomposer.org/installer | php chdir={{ downloadDir }}
+
+- name: Move Composer to /usr/local/bin
+  shell: creates="/usr/local/bin/composer" mv {{ downloadDir }}/composer.phar /usr/local/bin/composer
+  sudo: yes
+
+- name: Make Composer executable
+  shell: chmod +x /usr/local/bin/composer
+  sudo: yes
+
+- name: prepare dir for Adminer
+  file: path={{ apacheLocalhostDocumentRoot }}/adminer state=directory
+
+- name: download Adminer
+  get_url: dest={{ apacheLocalhostDocumentRoot }}/adminer/index.php mode=0644 url=http://downloads.sourceforge.net/project/adminer/Adminer/Adminer%204.1.0/adminer-4.1.0.php?r=http%3A%2F%2Fwww.adminer.org%2F&ts=1401954975&use_mirror=garr
+
+
+- name: add Node.JS repo
+  shell: curl -sL https://deb.nodesource.com/setup | sudo bash -
+  sudo: yes
+
+- name: install Node.JS
+  apt: name="nodejs" state=present
+  sudo: yes
+
+# Only LESS now, but maybe I will need more :)
+- name: install essential Node.JS packages
+  npm: name="{{ item }}" global=yes
+  with_items:
+    - less
+  sudo: yes
+
+- name: install Ruby
+  include: ruby.yml
+
+- name: install essential Ruby gems
+  shell: sudo -iu {{ ansible_ssh_user }} ~/.rbenv/shims/gem install {{ item }} executable=/bin/bash
+  with_items:
+    - sass
+    - bourbon
+
+
+
+
+

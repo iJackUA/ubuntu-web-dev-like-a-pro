@@ -1,0 +1,23 @@
+---
+- name: set hostname
+  shell: hostname {{ hostname }}
+  sudo: yes
+
+- name: update APT cache
+  apt: update_cache=yes
+  sudo: yes
+
+- name: upgrade dist
+  apt: upgrade=dist
+  sudo: yes
+
+- name: locale magic
+  shell: locale-gen en_US.UTF-8
+  shell: export LANG=en_US.UTF-8
+  sudo: yes
+
+- name: create directories
+  file: path="{{ item }}" state=directory
+  with_items:
+    - "{{ downloadDir }}"
+    - "{{ installDir }}"

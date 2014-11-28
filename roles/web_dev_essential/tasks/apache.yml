@@ -1,0 +1,34 @@
+---
+- name: Ensure Apache installed
+  apt: pkg=apache2 state=latest
+  sudo: yes
+
+- name: Make the Apache load under our user account
+  lineinfile: dest=/etc/apache2/envvars regexp="^export {{ item.param }}=" line="export {{ item.param }}={{ item.value }}"
+  with_items :
+    - { param: APACHE_RUN_USER, value: "{{ ansible_ssh_user }}" }
+    - { param: APACHE_RUN_GROUP, value: "{{ ansible_ssh_user }}" }
+  sudo: yes
+  notify : restart apache
+
+- name: Change Apache default site
+  template: src=apache2-default.j2 dest=/etc/apache2/sites-available/000-default.conf owner=root group=root mode=0644
+  sudo: yes
+  notify : restart apache
+
+- name: Copy servername file for Apache
+  template: src=servername.j2 dest=/etc/apache2/conf-enabled/servername.conf owner=root mode=0644
+  sudo: yes
+
+- name: Remove /var/lock/apache to prevent permission problem
+  file: path=/var/lock/apache2 state=absent
+  sudo: yes
+
+- name: Enable Apache mod_rewrite
+  shell: a2enmod rewrite
+  sudo: yes
+  notify : restart apache
+
+- name: Service Apache
+  service: name=apache2 state=started enabled=yes
+  sudo: yes

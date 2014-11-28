@@ -1,0 +1,9 @@
+---
+- name: Download oDesk tracker
+  shell: aria2c -c -x 10 -s {{ downloadThreads }}  https://www.odesk.com/downloads/linux/beta/odeskteam_{{ vODesk }}_amd64.deb chdir={{ downloadDir }} creates=odeskteam_{{ vODesk }}_amd64.deb
+
+- name: Install oDesk tracker
+  apt: deb={{ downloadDir }}/odeskteam_{{ vODesk }}_amd64.deb
+  sudo: yes
+
+- include: elance.yml

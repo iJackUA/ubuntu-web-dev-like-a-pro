@@ -1,0 +1,38 @@
+---
+- name: ensure system general packages are installed
+  apt: pkg="{{ item }}" state=latest
+  with_items:
+    - libreoffice
+    - libreoffice-writer
+    - libreoffice-calc
+    - libreoffice-draw
+    - libreoffice-impress
+    - thunderbird
+    - deluge
+    - filezilla
+    - keepassx
+  sudo: yes
+
+
+- name: Download Dropbox
+  shell: aria2c -c -x 10 -s {{ downloadThreads }} https://www.dropbox.com/download?dl=packages/ubuntu/dropbox_{{ vDropbox }}_amd64.deb chdir={{ downloadDir }} creates=dropbox_{{ vDropbox }}_amd64.deb
+
+- name: Install Dropbox
+  apt: deb={{ downloadDir }}/dropbox_{{ vDropbox }}_amd64.deb
+  sudo: yes
+
+
+- name: Download Skype 4.3
+  shell: axel -n {{ downloadThreads }} http://download.skype.com/linux/skype-ubuntu-precise_4.3.0.37-1_i386.deb chdir={{ downloadDir }} creates=skype-ubuntu-precise_4.3.0.37-1_i386.deb
+
+- name: Install Skype 4.3
+  apt: deb={{ downloadDir }}/skype-ubuntu-precise_4.3.0.37-1_i386.deb
+  sudo: yes
+
+
+- name: Download Teamviewer
+  shell: axel -n {{ downloadThreads }} http://download.teamviewer.com/download/teamviewer_linux.deb chdir={{ downloadDir }} creates=teamviewer_linux.deb
+
+- name: Install Teamviewer
+  apt: deb={{ downloadDir }}/teamviewer_linux.deb
+  sudo: yes
