@@ -42,8 +42,8 @@
 
 
 - name: Download Brakets
-  shell: aria2c -c -x 10 -s {{ downloadThreads }} https://github.com/adobe/brackets/releases/download/release-1.0/Brackets.Release.1.0.64-bit.deb chdir={{ downloadDir }} creates=Brackets.Release.1.0.64-bit.deb
+  shell: aria2c -c -x 10 -s {{ downloadThreads }} https://github.com/adobe/brackets/releases/download/release-1.1/Brackets.Release.1.1.64-bit.deb chdir={{ downloadDir }} creates=Brackets.Release.1.1.64-bit.deb
 
 - name: Install Brakets
-  apt: deb={{ downloadDir }}/Brackets.Release.1.0.64-bit.deb
+  apt: deb={{ downloadDir }}/Brackets.Release.1.1.64-bit.deb
   sudo: yes
