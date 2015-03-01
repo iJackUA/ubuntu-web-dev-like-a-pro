@@ -9,16 +9,16 @@
     apacheLocalhostDocumentRoot: /home/{{ ansible_ssh_user }}/www
     downloadThreads: 20
     installNvidiaDriver: "no"
-    vPhpStorm: 8.0.1
-    vPyCharm: 3.4.1
-    vRubyMine: 7.0
+    vPhpStorm: 8.0.3
+    vPyCharm: 4.0.4
+    vRubyMine: 7.0.4
     vODesk: 3.12.9
-    vVagrant: 1.6.5
-    vMySQLWB: 6.2.3-1ubu1404
-    v0xDBE: 138.2222.2
+    vVagrant: 1.7.2
+    vMySQLWB: 6.2.4-1ubu1404
+    v0xDBE: 139.795.5
     vRoboMongo: 0.8.4
     vDropbox: 1.6.2
-    vRuby_rbenv: 2.1.5
+    vRuby_rbenv: 2.2.0
 
   roles:
       - initial
@@ -29,6 +29,6 @@
       - system_general
       - web_dev_essential
       - web_dev_tools
-#     - tracker    # uncomment to install oDesk and Elance trackers
+#      - tracker    # uncomment to install oDesk and Elance trackers
       - media
       - tweak
