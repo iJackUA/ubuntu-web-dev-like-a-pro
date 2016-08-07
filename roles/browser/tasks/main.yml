@@ -9,7 +9,7 @@
 
 
 - name: import Browser repo keys
-  shell: wget -q -O - {{ item }} | sudo apt-key add -
+  apt_key: url="{{ item }}" state=present
   with_items:
     - https://dl-ssl.google.com/linux/linux_signing_key.pub
     - http://deb.opera.com/archive.key
